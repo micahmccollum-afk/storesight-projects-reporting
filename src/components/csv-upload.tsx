@@ -99,7 +99,7 @@ export function CSVUpload({ onUploadSuccess, compact = false }: CSVUploadProps) 
 
   if (compact) {
     return (
-      <>
+      <div className="relative">
         <input
           ref={fileInputRef}
           type="file"
@@ -113,17 +113,34 @@ export function CSVUpload({ onUploadSuccess, compact = false }: CSVUploadProps) 
           className={cn(
             "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors",
             "border border-border bg-card text-card-foreground hover:bg-accent",
-            "disabled:opacity-50 disabled:cursor-not-allowed"
+            "disabled:opacity-50 disabled:cursor-not-allowed",
+            uploadResult?.success === true && "border-success text-success",
+            uploadResult?.success === false && "border-destructive text-destructive"
           )}
         >
           {isUploading ? (
             <Loader2 className="w-4 h-4 animate-spin" />
+          ) : uploadResult?.success === true ? (
+            <CheckCircle2 className="w-4 h-4" />
+          ) : uploadResult?.success === false ? (
+            <AlertCircle className="w-4 h-4" />
           ) : (
             <Upload className="w-4 h-4" />
           )}
-          {isUploading ? "Uploading..." : "Upload CSV"}
+          {isUploading
+            ? "Uploading..."
+            : uploadResult?.success === true
+              ? "Done!"
+              : uploadResult?.success === false
+                ? "Failed"
+                : "Upload CSV"}
         </button>
-      </>
+        {uploadResult && !uploadResult.success && (
+          <div className="absolute top-full right-0 mt-2 w-64 p-3 bg-card border border-destructive rounded-lg shadow-lg text-xs text-destructive z-50">
+            {uploadResult.message}
+          </div>
+        )}
+      </div>
     );
   }
 
