@@ -4,7 +4,7 @@ import { DashboardHeader } from "@/components/dashboard-header";
 import { KPICards } from "@/components/kpi-cards";
 import { ActivationsByProductChart } from "@/components/activations-by-product-chart";
 import { RevenueByProductChart } from "@/components/revenue-by-product-chart";
-import { RevenueOverTimeChart } from "@/components/revenue-over-time-chart";
+import { PerformanceHighlights } from "@/components/performance-highlights";
 import { ProjectTable } from "@/components/project-table";
 import { CSVUpload } from "@/components/csv-upload";
 import { ConnectionBanner } from "@/components/connection-banner";
@@ -52,8 +52,9 @@ export default function Dashboard() {
               />
             </div>
 
-            <RevenueOverTimeChart
-              data={data?.revenueByMonth || []}
+            <PerformanceHighlights
+              projects={data?.projects || []}
+              revenueByProduct={data?.revenueByProduct || []}
               isLoading={isLoading}
             />
 
