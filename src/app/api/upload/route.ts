@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { put } from "@vercel/blob";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 
@@ -16,11 +17,9 @@ function convertToUtf8Csv(buffer: ArrayBuffer): string {
   let text: string;
 
   if (bytes.length >= 2 && bytes[0] === 0xff && bytes[1] === 0xfe) {
-    const decoder = new TextDecoder("utf-16le");
-    text = decoder.decode(bytes);
+    text = new TextDecoder("utf-16le").decode(bytes);
   } else if (bytes.length >= 2 && bytes[0] === 0xfe && bytes[1] === 0xff) {
-    const decoder = new TextDecoder("utf-16be");
-    text = decoder.decode(bytes);
+    text = new TextDecoder("utf-16be").decode(bytes);
   } else {
     if (
       bytes.length >= 3 &&
@@ -62,7 +61,10 @@ function convertToUtf8Csv(buffer: ArrayBuffer): string {
 }
 
 export async function POST(request: NextRequest) {
+  let step = "init";
+
   try {
+    step = "parsing formData";
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
 
@@ -80,7 +82,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    step = "reading file buffer";
     const buffer = await file.arrayBuffer();
+
+    step = "converting to UTF-8 CSV";
     const text = convertToUtf8Csv(buffer);
     const lines = text.trim().split("\n");
 
@@ -92,7 +97,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (hasBlobToken()) {
-      const { put } = await import("@vercel/blob");
+      step = "uploading to Vercel Blob";
       const blob = await put(BLOB_FILENAME, text, {
         access: "public",
         addRandomSuffix: false,
@@ -115,6 +120,7 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     } else {
+      step = "writing to local filesystem";
       await mkdir(DATA_DIR, { recursive: true });
       await writeFile(CSV_PATH, text, "utf-8");
 
@@ -128,14 +134,9 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Failed to upload file";
-    const detail = error instanceof Error ? error.stack : String(error);
-    console.error("Upload error:", detail);
+    console.error(`Upload error at step "${step}":`, error);
     return NextResponse.json(
-      {
-        error: message,
-        hasBlobToken: hasBlobToken(),
-        isVercel: !!process.env.VERCEL,
-      },
+      { error: `${message} (failed at: ${step})` },
       { status: 500 }
     );
   }
