@@ -101,6 +101,7 @@ export async function POST(request: NextRequest) {
       const blob = await put(BLOB_FILENAME, text, {
         access: "public",
         addRandomSuffix: false,
+        allowOverwrite: true,
         contentType: "text/csv",
       });
 
