@@ -106,6 +106,14 @@ export async function POST(request: NextRequest) {
         headers: lines[0].split(",").length,
         url: blob.url,
       });
+    } else if (process.env.VERCEL) {
+      return NextResponse.json(
+        {
+          error:
+            "Blob storage is not configured. Add a Blob store in your Vercel project's Storage tab, then redeploy.",
+        },
+        { status: 500 }
+      );
     } else {
       await mkdir(DATA_DIR, { recursive: true });
       await writeFile(CSV_PATH, text, "utf-8");
