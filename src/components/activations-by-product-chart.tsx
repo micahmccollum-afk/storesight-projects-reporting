@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import {
   ResponsiveContainer,
   PieChart,
@@ -9,6 +10,8 @@ import {
   Legend,
 } from "recharts";
 import type { ProductBreakdown } from "@/lib/types";
+import { getChartColors } from "@/lib/chart-theme";
+import { useTheme } from "./theme-provider";
 
 interface ActivationsByProductChartProps {
   data: ProductBreakdown[];
@@ -32,6 +35,9 @@ export function ActivationsByProductChart({
   data,
   isLoading,
 }: ActivationsByProductChartProps) {
+  const { theme } = useTheme();
+  const colors = useMemo(() => getChartColors(), [theme]);
+
   if (isLoading) {
     return (
       <div className="bg-card rounded-2xl border border-border p-6 shadow-sm">
@@ -77,25 +83,25 @@ export function ActivationsByProductChart({
                 key={index}
                 fill={COLORS[index % COLORS.length]}
                 fillOpacity={0.85}
-                stroke="white"
+                stroke={theme === "dark" ? "#1a1228" : "white"}
                 strokeWidth={2}
               />
             ))}
           </Pie>
           <Tooltip
             contentStyle={{
-              backgroundColor: "white",
-              border: "1px solid #D9E2FF",
+              backgroundColor: colors.tooltipBg,
+              border: `1px solid ${colors.tooltipBorder}`,
               borderRadius: "12px",
               fontSize: "13px",
               padding: "10px 14px",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
             }}
             formatter={(value: number | undefined, name: string | undefined) => [
               value !== undefined ? `${value} projects` : "",
               name || "Activations",
             ]}
-            labelStyle={{ fontWeight: 600, marginBottom: 4 }}
+            labelStyle={{ fontWeight: 600, marginBottom: 4, color: colors.label }}
             labelFormatter={() => ""}
           />
           <Legend
@@ -104,7 +110,11 @@ export function ActivationsByProductChart({
             verticalAlign="middle"
             iconType="circle"
             iconSize={8}
-            wrapperStyle={{ fontSize: "12px", lineHeight: "20px" }}
+            wrapperStyle={{
+              fontSize: "12px",
+              lineHeight: "20px",
+              color: colors.label,
+            }}
             formatter={(value: string) =>
               value.length > 20 ? value.slice(0, 20) + "..." : value
             }

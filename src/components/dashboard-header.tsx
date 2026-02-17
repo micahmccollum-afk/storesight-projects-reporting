@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, Sun, Moon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CSVUpload } from "./csv-upload";
+import { useTheme } from "./theme-provider";
 
 interface DashboardHeaderProps {
   isLoading: boolean;
@@ -20,6 +21,8 @@ export function DashboardHeader({
   onUploadSuccess,
   lastUpdated,
 }: DashboardHeaderProps) {
+  const { theme, toggleTheme } = useTheme();
+
   return (
     <header className="flex items-center justify-between">
       <div className="flex items-center gap-4">
@@ -29,7 +32,7 @@ export function DashboardHeader({
           width={180}
           height={40}
           priority
-          className="h-9 w-auto"
+          className={cn("h-9 w-auto", theme === "dark" && "brightness-0 invert")}
         />
         <div className="hidden sm:block h-8 w-px bg-border" />
         <p className="hidden sm:block text-sm font-medium text-muted-foreground">
@@ -43,6 +46,17 @@ export function DashboardHeader({
             Updated {lastUpdated.toLocaleTimeString()}
           </span>
         )}
+        <button
+          onClick={toggleTheme}
+          className="flex items-center justify-center w-9 h-9 rounded-lg border border-border bg-card text-card-foreground hover:bg-accent transition-colors"
+          title={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
+        >
+          {theme === "light" ? (
+            <Moon className="w-4 h-4" />
+          ) : (
+            <Sun className="w-4 h-4" />
+          )}
+        </button>
         <CSVUpload onUploadSuccess={onUploadSuccess} compact />
         {hasData && (
           <button

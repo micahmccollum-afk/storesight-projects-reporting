@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import {
   ResponsiveContainer,
   BarChart,
@@ -12,6 +13,8 @@ import {
 } from "recharts";
 import type { ProductBreakdown } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
+import { getChartColors } from "@/lib/chart-theme";
+import { useTheme } from "./theme-provider";
 
 interface RevenueByProductChartProps {
   data: ProductBreakdown[];
@@ -39,6 +42,9 @@ export function RevenueByProductChart({
   data,
   isLoading,
 }: RevenueByProductChartProps) {
+  const { theme } = useTheme();
+  const colors = useMemo(() => getChartColors(), [theme]);
+
   if (isLoading) {
     return (
       <div className="bg-card rounded-2xl border border-border p-6 shadow-sm">
@@ -69,13 +75,13 @@ export function RevenueByProductChart({
           <CartesianGrid
             strokeDasharray="3 3"
             horizontal={false}
-            stroke="#D9E2FF"
+            stroke={colors.grid}
           />
           <XAxis
             type="number"
             tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
             fontSize={12}
-            tick={{ fill: "#6E328C" }}
+            tick={{ fill: colors.tick }}
             axisLine={false}
             tickLine={false}
           />
@@ -84,25 +90,25 @@ export function RevenueByProductChart({
             dataKey="productName"
             width={170}
             fontSize={12}
-            tick={{ fill: "#463572" }}
+            tick={{ fill: colors.label }}
             axisLine={false}
             tickLine={false}
             tickFormatter={(v) => truncateLabel(v)}
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: "white",
-              border: "1px solid #D9E2FF",
+              backgroundColor: colors.tooltipBg,
+              border: `1px solid ${colors.tooltipBorder}`,
               borderRadius: "12px",
               fontSize: "13px",
               padding: "10px 14px",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
             }}
             formatter={(value: number | undefined) => [
-            value !== undefined ? formatCurrency(value) : "",
-            "Revenue",
-          ]}
-            labelStyle={{ fontWeight: 600, marginBottom: 4 }}
+              value !== undefined ? formatCurrency(value) : "",
+              "Revenue",
+            ]}
+            labelStyle={{ fontWeight: 600, marginBottom: 4, color: colors.label }}
           />
           <Bar dataKey="revenue" radius={[0, 6, 6, 0]} barSize={24}>
             {top10.map((_, index) => (
