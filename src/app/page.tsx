@@ -2,6 +2,7 @@
 
 import { DashboardHeader } from "@/components/dashboard-header";
 import { KPICards } from "@/components/kpi-cards";
+import { ActivationsByProductChart } from "@/components/activations-by-product-chart";
 import { RevenueByProductChart } from "@/components/revenue-by-product-chart";
 import { RevenueOverTimeChart } from "@/components/revenue-over-time-chart";
 import { ProjectTable } from "@/components/project-table";
@@ -41,15 +42,20 @@ export default function Dashboard() {
             <KPICards kpis={data?.kpis} isLoading={isLoading} />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <ActivationsByProductChart
+                data={data?.revenueByProduct || []}
+                isLoading={isLoading}
+              />
               <RevenueByProductChart
                 data={data?.revenueByProduct || []}
                 isLoading={isLoading}
               />
-              <RevenueOverTimeChart
-                data={data?.revenueByMonth || []}
-                isLoading={isLoading}
-              />
             </div>
+
+            <RevenueOverTimeChart
+              data={data?.revenueByMonth || []}
+              isLoading={isLoading}
+            />
 
             <ProjectTable
               data={data?.projects || []}
