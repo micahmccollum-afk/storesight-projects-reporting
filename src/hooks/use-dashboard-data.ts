@@ -32,9 +32,11 @@ export function useDashboardData() {
     queryFn: fetchDashboardData,
   });
 
-  const refetch = useCallback(() => {
-    queryClient.removeQueries({ queryKey: ["dashboard-data"] });
-    queryClient.invalidateQueries({ queryKey: ["dashboard-data"] });
+  const refetch = useCallback(async () => {
+    await queryClient.refetchQueries({
+      queryKey: ["dashboard-data"],
+      type: "all",
+    });
   }, [queryClient]);
 
   return {
