@@ -1,26 +1,43 @@
 import { NextResponse } from "next/server";
-import { list } from "@vercel/blob";
+import { readFile } from "fs/promises";
+import { existsSync } from "fs";
+import path from "path";
 import { parseCSV } from "@/lib/csv-parser";
 import { processDashboardData } from "@/lib/data-processing";
 
 const BLOB_FILENAME = "projects.csv";
+const CSV_PATH = path.join(process.cwd(), "data", "projects.csv");
+
+function hasBlobToken(): boolean {
+  return !!process.env.BLOB_READ_WRITE_TOKEN;
+}
 
 export async function GET() {
   try {
-    // Find the blob by prefix
-    const { blobs } = await list({ prefix: BLOB_FILENAME, limit: 1 });
+    let csvText: string;
 
-    if (blobs.length === 0) {
-      return NextResponse.json({ noData: true });
+    if (hasBlobToken()) {
+      const { list } = await import("@vercel/blob");
+      const { blobs } = await list({ prefix: BLOB_FILENAME, limit: 1 });
+
+      if (blobs.length === 0) {
+        return NextResponse.json({ noData: true });
+      }
+
+      const response = await fetch(blobs[0].url);
+      if (!response.ok) {
+        return NextResponse.json({ noData: true });
+      }
+
+      csvText = await response.text();
+    } else {
+      if (!existsSync(CSV_PATH)) {
+        return NextResponse.json({ noData: true });
+      }
+
+      csvText = await readFile(CSV_PATH, "utf-8");
     }
 
-    // Fetch the CSV content from the blob URL
-    const response = await fetch(blobs[0].url);
-    if (!response.ok) {
-      return NextResponse.json({ noData: true });
-    }
-
-    const csvText = await response.text();
     const rawRows = parseCSV(csvText);
     const data = processDashboardData(rawRows);
 

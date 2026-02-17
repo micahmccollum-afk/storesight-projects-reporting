@@ -1,25 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
-import { put } from "@vercel/blob";
+import { writeFile, mkdir } from "fs/promises";
+import path from "path";
 
 const BLOB_FILENAME = "projects.csv";
+const DATA_DIR = path.join(process.cwd(), "data");
+const CSV_PATH = path.join(DATA_DIR, "projects.csv");
+
+function hasBlobToken(): boolean {
+  return !!process.env.BLOB_READ_WRITE_TOKEN;
+}
 
 function convertToUtf8Csv(buffer: ArrayBuffer): string {
   const bytes = new Uint8Array(buffer);
 
   let text: string;
 
-  // Detect UTF-16 LE BOM (0xFF 0xFE)
   if (bytes.length >= 2 && bytes[0] === 0xff && bytes[1] === 0xfe) {
     const decoder = new TextDecoder("utf-16le");
     text = decoder.decode(bytes);
-  }
-  // Detect UTF-16 BE BOM (0xFE 0xFF)
-  else if (bytes.length >= 2 && bytes[0] === 0xfe && bytes[1] === 0xff) {
+  } else if (bytes.length >= 2 && bytes[0] === 0xfe && bytes[1] === 0xff) {
     const decoder = new TextDecoder("utf-16be");
     text = decoder.decode(bytes);
-  }
-  // Detect UTF-8 BOM or plain UTF-8
-  else {
+  } else {
     if (
       bytes.length >= 3 &&
       bytes[0] === 0xef &&
@@ -32,10 +34,8 @@ function convertToUtf8Csv(buffer: ArrayBuffer): string {
     }
   }
 
-  // Remove any BOM character that made it through
   text = text.replace(/^\uFEFF/, "");
 
-  // Detect delimiter: if first line has tabs, it's TSV
   const firstLine = text.split("\n")[0];
   if (firstLine.includes("\t")) {
     const lines = text.split("\n");
@@ -91,20 +91,32 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Upload to Vercel Blob (overwrites any existing file with the same name)
-    const blob = await put(BLOB_FILENAME, text, {
-      access: "public",
-      addRandomSuffix: false,
-      contentType: "text/csv",
-    });
+    if (hasBlobToken()) {
+      const { put } = await import("@vercel/blob");
+      const blob = await put(BLOB_FILENAME, text, {
+        access: "public",
+        addRandomSuffix: false,
+        contentType: "text/csv",
+      });
 
-    return NextResponse.json({
-      success: true,
-      filename: file.name,
-      rows: lines.length - 1,
-      headers: lines[0].split(",").length,
-      url: blob.url,
-    });
+      return NextResponse.json({
+        success: true,
+        filename: file.name,
+        rows: lines.length - 1,
+        headers: lines[0].split(",").length,
+        url: blob.url,
+      });
+    } else {
+      await mkdir(DATA_DIR, { recursive: true });
+      await writeFile(CSV_PATH, text, "utf-8");
+
+      return NextResponse.json({
+        success: true,
+        filename: file.name,
+        rows: lines.length - 1,
+        headers: lines[0].split(",").length,
+      });
+    }
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Failed to upload file";
