@@ -51,6 +51,8 @@ export function CSVUpload({ onUploadSuccess, compact = false }: CSVUploadProps) 
           message: `Uploaded ${data.filename} (${data.rows} rows)`,
         });
 
+        // Small delay to ensure blob is readable before refetching
+        await new Promise((resolve) => setTimeout(resolve, 1500));
         onUploadSuccess();
 
         setTimeout(() => {

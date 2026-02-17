@@ -1,7 +1,6 @@
 "use client";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback } from "react";
+import { useQuery } from "@tanstack/react-query";
 import type { DashboardData } from "@/lib/types";
 
 interface DashboardResponse extends DashboardData {
@@ -25,19 +24,11 @@ async function fetchDashboardData(): Promise<DashboardResponse> {
 }
 
 export function useDashboardData() {
-  const queryClient = useQueryClient();
-
   const query = useQuery<DashboardResponse>({
     queryKey: ["dashboard-data"],
     queryFn: fetchDashboardData,
+    staleTime: 0,
   });
-
-  const refetch = useCallback(async () => {
-    await queryClient.refetchQueries({
-      queryKey: ["dashboard-data"],
-      type: "all",
-    });
-  }, [queryClient]);
 
   return {
     data: query.data,
@@ -45,7 +36,7 @@ export function useDashboardData() {
     isError: query.isError && !query.data?.noData,
     error: query.error,
     noData: query.data?.noData === true,
-    refetch,
+    refetch: query.refetch,
     dataUpdatedAt: query.dataUpdatedAt
       ? new Date(query.dataUpdatedAt)
       : undefined,
