@@ -91,11 +91,12 @@ export function ActivationsByProductChart({
               padding: "10px 14px",
               boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
             }}
-            formatter={(value: number | undefined) => [
+            formatter={(value: number | undefined, name: string | undefined) => [
               value !== undefined ? `${value} projects` : "",
-              "Activations",
+              name || "Activations",
             ]}
             labelStyle={{ fontWeight: 600, marginBottom: 4 }}
+            labelFormatter={() => ""}
           />
           <Legend
             layout="vertical"
