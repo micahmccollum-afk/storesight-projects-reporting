@@ -12,6 +12,8 @@ function hasBlobToken(): boolean {
   return !!process.env.BLOB_READ_WRITE_TOKEN;
 }
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     let csvText: string;
@@ -24,7 +26,7 @@ export async function GET() {
         return NextResponse.json({ noData: true });
       }
 
-      const response = await fetch(blobs[0].url);
+      const response = await fetch(blobs[0].url, { cache: "no-store" });
       if (!response.ok) {
         return NextResponse.json({ noData: true });
       }

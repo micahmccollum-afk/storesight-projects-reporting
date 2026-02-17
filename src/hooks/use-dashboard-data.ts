@@ -10,7 +10,9 @@ interface DashboardResponse extends DashboardData {
 }
 
 async function fetchDashboardData(): Promise<DashboardResponse> {
-  const response = await fetch("/api/data");
+  const response = await fetch(`/api/data?t=${Date.now()}`, {
+    cache: "no-store",
+  });
   const data = await response.json();
 
   if (data.noData) return data;
@@ -31,6 +33,7 @@ export function useDashboardData() {
   });
 
   const refetch = useCallback(() => {
+    queryClient.removeQueries({ queryKey: ["dashboard-data"] });
     queryClient.invalidateQueries({ queryKey: ["dashboard-data"] });
   }, [queryClient]);
 

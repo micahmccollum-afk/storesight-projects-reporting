@@ -51,10 +51,11 @@ export function CSVUpload({ onUploadSuccess, compact = false }: CSVUploadProps) 
           message: `Uploaded ${data.filename} (${data.rows} rows)`,
         });
 
+        onUploadSuccess();
+
         setTimeout(() => {
-          onUploadSuccess();
           setUploadResult(null);
-        }, 1500);
+        }, 3000);
       } catch (error) {
         setUploadResult({
           success: false,
