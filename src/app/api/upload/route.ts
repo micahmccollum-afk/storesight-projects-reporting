@@ -128,6 +128,15 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Failed to upload file";
-    return NextResponse.json({ error: message }, { status: 500 });
+    const detail = error instanceof Error ? error.stack : String(error);
+    console.error("Upload error:", detail);
+    return NextResponse.json(
+      {
+        error: message,
+        hasBlobToken: hasBlobToken(),
+        isVercel: !!process.env.VERCEL,
+      },
+      { status: 500 }
+    );
   }
 }
