@@ -19,16 +19,16 @@ interface RevenueByProductChartProps {
 }
 
 const COLORS = [
-  "#2563eb",
-  "#7c3aed",
-  "#0891b2",
-  "#059669",
-  "#d97706",
-  "#dc2626",
-  "#4f46e5",
-  "#0d9488",
-  "#ca8a04",
-  "#9333ea",
+  "#6D36FF",
+  "#9C5CFF",
+  "#C980FF",
+  "#FFA450",
+  "#FFDF50",
+  "#81D994",
+  "#D60046",
+  "#4E339C",
+  "#34508A",
+  "#CA88E9",
 ];
 
 function truncateLabel(label: string, maxLen: number = 22): string {
@@ -69,13 +69,13 @@ export function RevenueByProductChart({
           <CartesianGrid
             strokeDasharray="3 3"
             horizontal={false}
-            stroke="#e2e8f0"
+            stroke="#D9E2FF"
           />
           <XAxis
             type="number"
             tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
             fontSize={12}
-            tick={{ fill: "#94a3b8" }}
+            tick={{ fill: "#6E328C" }}
             axisLine={false}
             tickLine={false}
           />
@@ -84,7 +84,7 @@ export function RevenueByProductChart({
             dataKey="productName"
             width={170}
             fontSize={12}
-            tick={{ fill: "#475569" }}
+            tick={{ fill: "#463572" }}
             axisLine={false}
             tickLine={false}
             tickFormatter={(v) => truncateLabel(v)}
@@ -92,7 +92,7 @@ export function RevenueByProductChart({
           <Tooltip
             contentStyle={{
               backgroundColor: "white",
-              border: "1px solid #e2e8f0",
+              border: "1px solid #D9E2FF",
               borderRadius: "12px",
               fontSize: "13px",
               padding: "10px 14px",

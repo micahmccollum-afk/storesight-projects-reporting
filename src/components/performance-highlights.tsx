@@ -40,8 +40,8 @@ function computeHighlights(
       label: "Top Product by Revenue",
       value: top.productName,
       detail: `${formatCurrency(top.revenue)} earned across ${top.projectCount} projects`,
-      color: "#d97706",
-      bg: "#fef3c7",
+      color: "#6D36FF",
+      bg: "#ECE5FF",
     });
   }
 
@@ -55,8 +55,8 @@ function computeHighlights(
       label: "Most Popular Product",
       value: mostActive.productName,
       detail: `${mostActive.projectCount} project activations`,
-      color: "#2563eb",
-      bg: "#dbeafe",
+      color: "#9C5CFF",
+      bg: "#ECE5FF",
     });
   }
 
@@ -85,8 +85,8 @@ function computeHighlights(
       label: "Top Client by Revenue",
       value: topClient[0],
       detail: `${formatCurrency(topClient[1])} from ${count} projects`,
-      color: "#7c3aed",
-      bg: "#ede9fe",
+      color: "#FFA450",
+      bg: "#FFF7ED",
     });
   }
 
@@ -100,8 +100,8 @@ function computeHighlights(
       label: "Highest Revenue Project",
       value: topProject.projectName,
       detail: `${formatCurrency(topProject.earnedRevenueWithFees)} — ${topProject.companyName}`,
-      color: "#059669",
-      bg: "#d1fae5",
+      color: "#81D994",
+      bg: "#ECFDF5",
     });
   }
 
@@ -116,8 +116,8 @@ function computeHighlights(
       label: "Most Active Client",
       value: mostActiveClient[0],
       detail: `${mostActiveClient[1]} projects totaling ${formatCurrency(rev)}`,
-      color: "#0891b2",
-      bg: "#cffafe",
+      color: "#4E339C",
+      bg: "#ECE5FF",
     });
   }
 
@@ -135,8 +135,8 @@ function computeHighlights(
       label: "Highest Avg Revenue Product",
       value: best.productName,
       detail: `${formatCurrency(Math.round(best.revenue / best.projectCount))} avg per project`,
-      color: "#dc2626",
-      bg: "#fee2e2",
+      color: "#D60046",
+      bg: "#FFF1F2",
     });
   }
 

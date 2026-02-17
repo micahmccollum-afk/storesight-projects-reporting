@@ -1,6 +1,7 @@
 "use client";
 
-import { BarChart3, RefreshCw } from "lucide-react";
+import Image from "next/image";
+import { RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CSVUpload } from "./csv-upload";
 
@@ -21,18 +22,19 @@ export function DashboardHeader({
 }: DashboardHeaderProps) {
   return (
     <header className="flex items-center justify-between">
-      <div className="flex items-center gap-3">
-        <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary text-primary-foreground">
-          <BarChart3 className="w-5 h-5" />
-        </div>
-        <div>
-          <h1 className="text-xl font-bold text-foreground">
-            Revenue & Product Report
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Marketplace project revenue and product performance
-          </p>
-        </div>
+      <div className="flex items-center gap-4">
+        <Image
+          src="/storesight-logo.png"
+          alt="Storesight"
+          width={180}
+          height={40}
+          priority
+          className="h-9 w-auto"
+        />
+        <div className="hidden sm:block h-8 w-px bg-border" />
+        <p className="hidden sm:block text-sm font-medium text-muted-foreground">
+          Revenue & Product Report
+        </p>
       </div>
 
       <div className="flex items-center gap-2">

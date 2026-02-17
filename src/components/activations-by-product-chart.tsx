@@ -16,16 +16,16 @@ interface ActivationsByProductChartProps {
 }
 
 const COLORS = [
-  "#2563eb",
-  "#7c3aed",
-  "#0891b2",
-  "#059669",
-  "#d97706",
-  "#dc2626",
-  "#4f46e5",
-  "#0d9488",
-  "#ca8a04",
-  "#9333ea",
+  "#6D36FF",
+  "#9C5CFF",
+  "#C980FF",
+  "#FFA450",
+  "#FFDF50",
+  "#81D994",
+  "#D60046",
+  "#4E339C",
+  "#34508A",
+  "#CA88E9",
 ];
 
 export function ActivationsByProductChart({
@@ -85,7 +85,7 @@ export function ActivationsByProductChart({
           <Tooltip
             contentStyle={{
               backgroundColor: "white",
-              border: "1px solid #e2e8f0",
+              border: "1px solid #D9E2FF",
               borderRadius: "12px",
               fontSize: "13px",
               padding: "10px 14px",

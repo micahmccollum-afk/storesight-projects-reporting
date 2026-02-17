@@ -14,9 +14,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Storesight - All Project Activity",
+  title: "Storesight - Revenue & Product Report",
   description:
-    "Dashboard for marketplace revenue and project trends from Tableau",
+    "Marketplace project revenue and product performance dashboard",
+  icons: {
+    icon: "/favicon.png",
+    apple: "/favicon.png",
+  },
 };
 
 export default function RootLayout({
