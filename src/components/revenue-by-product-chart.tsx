@@ -103,7 +103,9 @@ export function RevenueByProductChart({
               fontSize: "13px",
               padding: "10px 14px",
               boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+              color: colors.label,
             }}
+            itemStyle={{ color: colors.label }}
             formatter={(value: number | undefined) => [
               value !== undefined ? formatCurrency(value) : "",
               "Revenue",

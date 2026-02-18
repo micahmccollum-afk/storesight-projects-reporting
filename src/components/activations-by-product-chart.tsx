@@ -96,7 +96,9 @@ export function ActivationsByProductChart({
               fontSize: "13px",
               padding: "10px 14px",
               boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+              color: colors.label,
             }}
+            itemStyle={{ color: colors.label }}
             formatter={(value: number | undefined, name: string | undefined) => [
               value !== undefined ? `${value} projects` : "",
               name || "Activations",
