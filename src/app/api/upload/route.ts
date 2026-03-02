@@ -21,7 +21,27 @@ function convertToUtf8Csv(buffer: ArrayBuffer): string {
   } else if (bytes.length >= 2 && bytes[0] === 0xfe && bytes[1] === 0xff) {
     text = new TextDecoder("utf-16be").decode(bytes);
   } else {
-    if (
+    // Some Tableau exports are UTF-16 without BOM.
+    // Detect this by checking whether null bytes are mostly on odd/even positions.
+    const probeLength = Math.min(bytes.length, 512);
+    let evenNulls = 0;
+    let oddNulls = 0;
+
+    for (let i = 0; i < probeLength; i++) {
+      if (bytes[i] !== 0) continue;
+      if (i % 2 === 0) {
+        evenNulls += 1;
+      } else {
+        oddNulls += 1;
+      }
+    }
+
+    const nullBiasThreshold = 8;
+    if (oddNulls - evenNulls >= nullBiasThreshold) {
+      text = new TextDecoder("utf-16le").decode(bytes);
+    } else if (evenNulls - oddNulls >= nullBiasThreshold) {
+      text = new TextDecoder("utf-16be").decode(bytes);
+    } else if (
       bytes.length >= 3 &&
       bytes[0] === 0xef &&
       bytes[1] === 0xbb &&
