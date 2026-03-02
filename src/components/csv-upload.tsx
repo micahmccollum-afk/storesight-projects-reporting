@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Upload, FileSpreadsheet, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 
@@ -11,6 +11,7 @@ interface CSVUploadProps {
 
 export function CSVUpload({ onUploadSuccess, compact = false }: CSVUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
+  const [isPageDragging, setIsPageDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState<{
     success: boolean;
@@ -100,9 +101,64 @@ export function CSVUpload({ onUploadSuccess, compact = false }: CSVUploadProps) 
     [handleUpload]
   );
 
+  useEffect(() => {
+    if (!compact) return;
+
+    let dragCounter = 0;
+
+    const hasFiles = (e: DragEvent) =>
+      Array.from(e.dataTransfer?.types || []).includes("Files");
+
+    const onDragEnter = (e: DragEvent) => {
+      if (!hasFiles(e)) return;
+      e.preventDefault();
+      dragCounter += 1;
+      setIsPageDragging(true);
+    };
+
+    const onDragOver = (e: DragEvent) => {
+      if (!hasFiles(e)) return;
+      e.preventDefault();
+      if (!isPageDragging) setIsPageDragging(true);
+    };
+
+    const onDragLeave = (e: DragEvent) => {
+      if (!hasFiles(e)) return;
+      e.preventDefault();
+      dragCounter = Math.max(0, dragCounter - 1);
+      if (dragCounter === 0) setIsPageDragging(false);
+    };
+
+    const onDrop = (e: DragEvent) => {
+      if (!hasFiles(e)) return;
+      e.preventDefault();
+      dragCounter = 0;
+      setIsPageDragging(false);
+      const file = e.dataTransfer?.files?.[0];
+      if (file) void handleUpload(file);
+    };
+
+    window.addEventListener("dragenter", onDragEnter);
+    window.addEventListener("dragover", onDragOver);
+    window.addEventListener("dragleave", onDragLeave);
+    window.addEventListener("drop", onDrop);
+
+    return () => {
+      window.removeEventListener("dragenter", onDragEnter);
+      window.removeEventListener("dragover", onDragOver);
+      window.removeEventListener("dragleave", onDragLeave);
+      window.removeEventListener("drop", onDrop);
+    };
+  }, [compact, handleUpload, isPageDragging]);
+
   if (compact) {
     return (
-      <div className="relative">
+      <div
+        className="relative"
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
         <input
           ref={fileInputRef}
           type="file"
@@ -117,9 +173,11 @@ export function CSVUpload({ onUploadSuccess, compact = false }: CSVUploadProps) 
             "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors",
             "border border-border bg-card text-card-foreground hover:bg-accent",
             "disabled:opacity-50 disabled:cursor-not-allowed",
+            isDragging && "border-primary bg-primary/5 text-primary",
             uploadResult?.success === true && "border-success text-success",
             uploadResult?.success === false && "border-destructive text-destructive"
           )}
+          title="Click to upload or drag and drop a CSV file"
         >
           {isUploading ? (
             <Loader2 className="w-4 h-4 animate-spin" />
@@ -138,9 +196,29 @@ export function CSVUpload({ onUploadSuccess, compact = false }: CSVUploadProps) 
                 ? "Failed"
                 : "Upload CSV"}
         </button>
+        {isDragging && !isUploading && (
+          <div className="absolute top-full right-0 mt-2 w-56 p-2 bg-card border border-primary rounded-lg shadow-lg text-xs text-primary z-50">
+            Drop CSV to upload
+          </div>
+        )}
         {uploadResult && !uploadResult.success && (
           <div className="absolute top-full right-0 mt-2 w-64 p-3 bg-card border border-destructive rounded-lg shadow-lg text-xs text-destructive z-50">
             {uploadResult.message}
+          </div>
+        )}
+        {isPageDragging && !isUploading && (
+          <div className="fixed inset-0 z-[100] pointer-events-none">
+            <div className="absolute inset-0 bg-background/60 backdrop-blur-[1px]" />
+            <div className="absolute inset-6 rounded-2xl border-2 border-dashed border-primary bg-primary/10 flex items-center justify-center">
+              <div className="text-center px-4">
+                <p className="text-base sm:text-lg font-semibold text-primary">
+                  Drop CSV anywhere to upload
+                </p>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+                  Accepts Tableau &quot;All Project Activity&quot; export files
+                </p>
+              </div>
+            </div>
           </div>
         )}
       </div>
